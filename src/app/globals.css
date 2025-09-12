@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+:root {
+  --radius: 0.65rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.35 0.02 240);
+  --primary-foreground: oklch(0.98 0 0);
+  --secondary: oklch(0.95 0.01 240);
+  --secondary-foreground: oklch(0.35 0.02 240);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* KPI & Dashboard Colors */
+  --kpi-blue: oklch(0.6 0.15 240);
+  --kpi-blue-bg: oklch(0.95 0.05 240);
+  --kpi-green: oklch(0.6 0.15 140);
+  --kpi-green-bg: oklch(0.95 0.05 140);
+  --kpi-purple: oklch(0.6 0.15 280);
+  --kpi-purple-bg: oklch(0.95 0.05 280);
+  --kpi-orange: oklch(0.6 0.15 50);
+  --kpi-orange-bg: oklch(0.95 0.05 50);
+  --kpi-red: oklch(0.6 0.15 20);
+  --kpi-red-bg: oklch(0.95 0.05 20);
+  --kpi-yellow: oklch(0.6 0.15 80);
+  --kpi-yellow-bg: oklch(0.95 0.05 80);
+}
+
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.75 0.02 240);
+  --primary-foreground: oklch(0.15 0 0);
+  --secondary: oklch(0.35 0.01 240);
+  --secondary-foreground: oklch(0.95 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+  
+  /* KPI & Dashboard Colors - Dark Mode */
+  --kpi-blue: oklch(0.7 0.15 240);
+  --kpi-blue-bg: oklch(0.25 0.1 240);
+  --kpi-green: oklch(0.7 0.15 140);
+  --kpi-green-bg: oklch(0.25 0.1 140);
+  --kpi-purple: oklch(0.7 0.15 280);
+  --kpi-purple-bg: oklch(0.25 0.1 280);
+  --kpi-orange: oklch(0.7 0.15 50);
+  --kpi-orange-bg: oklch(0.25 0.1 50);
+  --kpi-red: oklch(0.7 0.15 20);
+  --kpi-red-bg: oklch(0.25 0.1 20);
+  --kpi-yellow: oklch(0.7 0.15 80);
+  --kpi-yellow-bg: oklch(0.25 0.1 80);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --radius: var(--radius);
+  
+  /* KPI Colors */
+  --color-kpi-blue: var(--kpi-blue);
+  --color-kpi-blue-bg: var(--kpi-blue-bg);
+  --color-kpi-green: var(--kpi-green);
+  --color-kpi-green-bg: var(--kpi-green-bg);
+  --color-kpi-purple: var(--kpi-purple);
+  --color-kpi-purple-bg: var(--kpi-purple-bg);
+  --color-kpi-orange: var(--kpi-orange);
+  --color-kpi-orange-bg: var(--kpi-orange-bg);
+  --color-kpi-red: var(--kpi-red);
+  --color-kpi-red-bg: var(--kpi-red-bg);
+  --color-kpi-yellow: var(--kpi-yellow);
+  --color-kpi-yellow-bg: var(--kpi-yellow-bg);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  
+  /* 기본 텍스트 색상 */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    color: var(--foreground);
+  }
+  
+  /* 입력 필드 스타일 */
+  input, textarea, select {
+    background-color: var(--input);
+    color: var(--foreground);
+    border-color: var(--border);
+  }
+  
+  /* 버튼 기본 스타일 */
+  button {
+    color: var(--foreground);
+  }
+
+  /* 커스텀 스크롤바 */
+  .custom-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+  }
+
+  /* 또는 얇은 스크롤바 스타일 */
+  .thin-scrollbar::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .thin-scrollbar::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-radius: 2px;
+  }
+  
+  .thin-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--muted-foreground);
+    border-radius: 2px;
+  }
+  
+  .thin-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--foreground);
+  }
+}
+/* Animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 1s ease-out;
+}
+
+.floating-icon {
+  animation: float 6s ease-in-out infinite;
+}
+/* Coming Soon 배지 */
+.coming-soon-badge {
+  @apply absolute top-2 right-2 text-xs px-2 py-1 rounded-full;
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}

@@ -57,7 +57,7 @@ export default function HomePage() {
         }
         toast.error(`${t('error.connectionFailed')}: ${errorMessage}`);
       }
-    } catch (error) {
+    } catch {
       toast.error(t('api.connectionError'));
     }
     setLoading(false);

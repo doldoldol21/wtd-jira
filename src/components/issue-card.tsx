@@ -1,17 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ExternalLink } from "lucide-react";
 import { t } from "@/lib/i18n";
-import { TranslatedText } from './translated-text';
 
 interface Issue {
   key: string;
   summary: string;
   status: string;
   created?: string;
-  daysOld?: number;
-  watchCount?: number;
-  commentCount?: number;
-  self?: string;
+  assignee?: string;
+  priority?: string;
+  watchers?: number;
+  comments?: number;
 }
 
 interface IssueCardProps {

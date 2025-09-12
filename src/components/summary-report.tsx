@@ -2,15 +2,40 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { t, getLanguage } from "@/lib/i18n";
 import { TranslatedText } from './translated-text';
 
+interface DashboardData {
+  kpi: {
+    totalIssues: number;
+    resolvedIssues: number;
+    resolutionRate: number;
+    avgResolutionDays: number;
+  };
+  issues?: {
+    recent?: Issue[];
+    oldestUnresolved?: Issue[];
+    popular?: Issue[];
+    hot?: Issue[];
+  };
+}
+
+interface Issue {
+  key: string;
+  summary: string;
+  status: string;
+  created?: string;
+  assignee?: string;
+  priority?: string;
+  watchers?: number;
+  comments?: number;
+}
+
 interface SummaryReportProps {
-  dashboardData: any;
+  dashboardData: DashboardData;
   startDate?: Date | null;
   endDate?: Date | null;
 }
 
 export function SummaryReport({ dashboardData, startDate, endDate }: SummaryReportProps) {
   const kpi = dashboardData?.kpi || {};
-  const issues = dashboardData?.issues || [];
   const lang = getLanguage();
   const countUnit = lang === 'ko' ? '개' : '';
   
@@ -27,9 +52,9 @@ export function SummaryReport({ dashboardData, startDate, endDate }: SummaryRepo
   // 완료율 계산
   const completionRate = kpi.totalIssues > 0 ? Math.round((kpi.resolvedIssues / kpi.totalIssues) * 100) : 0;
   
-  // API에서 제공하는 topLists 사용
-  const hotIssue = dashboardData?.topLists?.hot?.[0];
-  const popularIssue = dashboardData?.topLists?.popular?.[0];
+  // API에서 제공하는 issues 사용
+  const hotIssue = dashboardData?.issues?.hot?.[0];
+  const popularIssue = dashboardData?.issues?.popular?.[0];
 
   return (
     <Card className="mt-8">

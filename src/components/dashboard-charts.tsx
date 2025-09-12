@@ -12,6 +12,23 @@ interface DashboardData {
     resolutionRate: number;
     avgResolutionDays: number;
   };
+  issues?: {
+    recent?: Issue[];
+    oldestUnresolved?: Issue[];
+    popular?: Issue[];
+    hot?: Issue[];
+  };
+}
+
+interface Issue {
+  key: string;
+  summary: string;
+  status: string;
+  created?: string;
+  assignee?: string;
+  priority?: string;
+  watchers?: number;
+  comments?: number;
 }
 
 interface DashboardChartsProps {
@@ -41,15 +58,20 @@ export function DashboardCharts({ dashboardData }: DashboardChartsProps) {
     const resolvedIssues = dashboardData?.kpi?.resolvedIssues || 0;
     
     // dashboardData에서 날짜 범위 계산 (없으면 기본 3주)
-    const issues = dashboardData?.issues || [];
+    const allIssues = [
+      ...(dashboardData?.issues?.recent || []),
+      ...(dashboardData?.issues?.oldestUnresolved || []),
+      ...(dashboardData?.issues?.popular || []),
+      ...(dashboardData?.issues?.hot || [])
+    ];
     let startDate = new Date();
     let endDate = new Date();
     
-    if (issues.length > 0) {
-      const dates = issues.map((issue: any) => new Date(issue.created || issue.updated)).filter((d: any) => !isNaN(d.getTime()));
+    if (allIssues.length > 0) {
+      const dates = allIssues.map(issue => new Date(issue.created || '')).filter(d => !isNaN(d.getTime()));
       if (dates.length > 0) {
-        startDate = new Date(Math.min(...dates));
-        endDate = new Date(Math.max(...dates));
+        startDate = new Date(Math.min(...dates.map(d => d.getTime())));
+        endDate = new Date(Math.max(...dates.map(d => d.getTime())));
       }
     }
     

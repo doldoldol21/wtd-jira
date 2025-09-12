@@ -52,9 +52,6 @@ interface Issue {
   priority?: string;
   watchers?: number;
   comments?: number;
-  watchCount?: number;
-  commentCount?: number;
-  daysOld?: number;
 }
 
 interface Project {
@@ -110,17 +107,20 @@ export default function Dashboard() {
   useEffect(() => {
     const today = new Date();
     const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const thisMonthEndDate = today < lastDayOfMonth ? today : lastDayOfMonth;
     const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
     const lastMonthEnd = new Date(today.getFullYear(), today.getMonth(), 0);
 
     const presets: DatePreset[] = [
-      { label: t('dashboard.thisMonth'), startDate: firstDayOfMonth, endDate: today },
+      { label: t('dashboard.thisMonth'), startDate: firstDayOfMonth, endDate: thisMonthEndDate },
       { label: t('dashboard.lastMonth'), startDate: lastMonth, endDate: lastMonthEnd },
     ];
 
     setDatePresets(presets);
     setStartDate(firstDayOfMonth);
-    setEndDate(today);
+    setEndDate(thisMonthEndDate);
+    setSelectedPreset(t('dashboard.thisMonth'));
   }, []);
 
   // 스크롤 위치에 따른 화살표 표시 업데이트
@@ -156,21 +156,25 @@ export default function Dashboard() {
       
       setProjectsLoading(true);
       try {
-        const params = new URLSearchParams({
-          jiraUrl: jiraConfig.jiraUrl,
-          email: jiraConfig.email,
-          apiToken: jiraConfig.apiToken
+        const response = await fetch('/api/jira/projects', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            jiraUrl: jiraConfig.jiraUrl,
+            email: jiraConfig.email,
+            apiToken: jiraConfig.apiToken
+          }),
         });
         
-        const response = await fetch(`/api/jira/projects?${params}`);
-        const data = await response.json();
-        
-        if (data.success) {
-          setProjects(data.projects);
-          setShowRightArrow(data.projects.length > 3);
-        } else {
-          throw new Error(data.error);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const data = await response.json();
+        setProjects(data.projects || []);
+        setShowRightArrow((data.projects || []).length > 3);
       } catch (error) {
         console.error('Failed to fetch projects:', error);
         toast.error(t('error.projectsFailed'), {
@@ -209,23 +213,27 @@ export default function Dashboard() {
       const startDateStr = startDate.toISOString().split('T')[0];
       const endDateStr = endDate.toISOString().split('T')[0];
       
-      const params = new URLSearchParams({
-        project: selectedProject,
-        startDate: startDateStr,
-        endDate: endDateStr,
-        jiraUrl: jiraConfig.jiraUrl,
-        email: jiraConfig.email,
-        apiToken: jiraConfig.apiToken
+      const response = await fetch('/api/jira/issues', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          projectKey: selectedProject,
+          startDate: startDateStr,
+          endDate: endDateStr,
+          jiraUrl: jiraConfig.jiraUrl,
+          email: jiraConfig.email,
+          apiToken: jiraConfig.apiToken
+        }),
       });
-      
-      const response = await fetch(`/api/jira/issues?${params}`);
-      const data = await response.json();
 
-      if (data.success) {
-        setDashboardData(data);
-      } else {
-        throw new Error(data.error);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const data = await response.json();
+      setDashboardData(data);
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
       toast.error(t('error.dataFailed'));
@@ -535,26 +543,29 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <IssueCard
               title={t('issues.recentTop5')}
-              issues={dashboardData.topLists?.recent}
+              issues={dashboardData.issues?.recent || []}
               getExtraInfo={(issue) => new Date(issue.created!).toLocaleDateString()}
             />
             
             <IssueCard
               title={t('issues.oldestTop5')}
-              issues={dashboardData.topLists?.oldest}
-              getExtraInfo={(issue) => `${issue.daysOld}${t('issues.daysAgo')}`}
+              issues={dashboardData.issues?.oldestUnresolved || []}
+              getExtraInfo={(issue) => {
+                const daysOld = Math.floor((new Date().getTime() - new Date(issue.created!).getTime()) / (1000 * 60 * 60 * 24));
+                return `${daysOld}${t('issues.daysAgo')}`;
+              }}
             />
             
             <IssueCard
               title={t('issues.popularTop5')}
-              issues={dashboardData.topLists?.popular}
-              getExtraInfo={(issue) => `👀 ${issue.watchCount} ${t('issues.watchers')}`}
+              issues={dashboardData.issues?.popular || []}
+              getExtraInfo={(issue) => `👀 ${issue.watchers} ${t('issues.watchers')}`}
             />
             
             <IssueCard
               title={t('issues.hotTop5')}
-              issues={dashboardData.topLists?.hot}
-              getExtraInfo={(issue) => `💬 ${issue.commentCount} ${t('issues.comments')}`}
+              issues={dashboardData.issues?.hot || []}
+              getExtraInfo={(issue) => `💬 ${issue.comments} ${t('issues.comments')}`}
             />
           </div>
 

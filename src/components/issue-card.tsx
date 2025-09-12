@@ -7,10 +7,10 @@ interface Issue {
   summary: string;
   status: string;
   created?: string;
-  daysOld?: number;
-  watchCount?: number;
-  commentCount?: number;
-  self?: string;
+  assignee?: string;
+  priority?: string;
+  watchers?: number;
+  comments?: number;
 }
 
 interface IssueCardProps {

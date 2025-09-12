@@ -2,15 +2,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { t, getLanguage } from "@/lib/i18n";
 import { TranslatedText } from './translated-text';
 
+interface DashboardData {
+  kpi: {
+    totalIssues: number;
+    resolvedIssues: number;
+    resolutionRate: number;
+    avgResolutionDays: number;
+  };
+  issues?: unknown[];
+}
+
 interface SummaryReportProps {
-  dashboardData: any;
+  dashboardData: DashboardData;
   startDate?: Date | null;
   endDate?: Date | null;
 }
 
 export function SummaryReport({ dashboardData, startDate, endDate }: SummaryReportProps) {
   const kpi = dashboardData?.kpi || {};
-  const issues = dashboardData?.issues || [];
   const lang = getLanguage();
   const countUnit = lang === 'ko' ? '개' : '';
   

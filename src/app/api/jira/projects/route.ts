@@ -1,41 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getJiraHeaders, getJiraUrl } from '@/lib/jira';
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const jiraUrl = searchParams.get('jiraUrl');
-  const email = searchParams.get('email');
-  const apiToken = searchParams.get('apiToken');
+interface JiraProject {
+  id: string;
+  key: string;
+  name: string;
+}
 
-  if (!jiraUrl || !email || !apiToken) {
-    return NextResponse.json({ error: 'CONFIG_REQUIRED' }, { status: 400 });
-  }
+interface JiraProjectsResponse {
+  values: JiraProject[];
+}
 
+export async function POST(request: NextRequest) {
   try {
-    const response = await fetch(getJiraUrl(jiraUrl, '/project'), {
-      headers: getJiraHeaders(email, apiToken),
+    const { jiraUrl, email, apiToken } = await request.json();
+
+    if (!jiraUrl || !email || !apiToken) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const auth = Buffer.from(`${email}:${apiToken}`).toString('base64');
+    
+    const response = await fetch(`${jiraUrl}/rest/api/3/project/search`, {
+      headers: {
+        'Authorization': `Basic ${auth}`,
+        'Accept': 'application/json',
+      },
     });
 
     if (!response.ok) {
-      throw new Error(`Projects fetch failed: ${response.status}`);
+      const errorData = await response.json() as { errorMessages?: string[] };
+      return NextResponse.json({ 
+        error: 'Failed to fetch projects', 
+        details: errorData.errorMessages?.[0] || 'Unknown error'
+      }, { status: response.status });
     }
 
-    const projects = await response.json();
-
-    return NextResponse.json({
-      success: true,
-      projects: projects.map((p: any) => ({
-        key: p.key,
-        name: p.name,
-        id: p.id,
-        projectTypeKey: p.projectTypeKey
-      }))
-    });
+    const data = await response.json() as JiraProjectsResponse;
+    return NextResponse.json({ projects: data.values });
 
   } catch (error) {
-    return NextResponse.json({ 
-      error: 'Failed to fetch projects', 
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error('Error fetching Jira projects:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

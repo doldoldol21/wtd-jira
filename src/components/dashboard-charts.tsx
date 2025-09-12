@@ -5,8 +5,17 @@ import { t, getLanguage } from "@/lib/i18n";
 import { TranslatedText } from './translated-text';
 import { useMemo } from 'react';
 
+interface DashboardData {
+  kpi: {
+    totalIssues: number;
+    resolvedIssues: number;
+    resolutionRate: number;
+    avgResolutionDays: number;
+  };
+}
+
 interface DashboardChartsProps {
-  dashboardData: any;
+  dashboardData: DashboardData;
 }
 
 export function DashboardCharts({ dashboardData }: DashboardChartsProps) {

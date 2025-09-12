@@ -1,115 +1,106 @@
 'use client';
 
 import { useState } from 'react';
-import { DatePicker } from '@/components/ui/date-picker';
-import { t } from '@/lib/i18n';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface TestResponse {
+  success?: boolean;
+  error?: string;
+  projects?: Array<{ key: string; name: string }>;
+}
 
 export default function TestPage() {
-  const [result, setResult] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-  const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-  
-  const [startDate, setStartDate] = useState<Date>(firstDayOfMonth);
-  const [endDate, setEndDate] = useState<Date>(today);
+  const [jiraUrl, setJiraUrl] = useState('');
+  const [email, setEmail] = useState('');
+  const [apiToken, setApiToken] = useState('');
+  const [result, setResult] = useState<string>('');
 
-  const testJiraAPI = async () => {
-    setLoading(true);
+  const testConnection = async () => {
     try {
-      const response = await fetch('/api/jira-test');
-      const data = await response.json();
-      setResult(data);
-    } catch (error) {
-      setResult({ error: 'Failed to test API' });
+      const response = await fetch('/api/jira/test-connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jiraUrl, email, apiToken }),
+      });
+      const data: TestResponse = await response.json();
+      setResult(JSON.stringify(data, null, 2));
+    } catch {
+      setResult('Connection test failed');
     }
-    setLoading(false);
   };
 
-  const testJiraIssues = async () => {
-    setLoading(true);
+  const testProjects = async () => {
     try {
-      const startDateStr = startDate.toISOString().split('T')[0];
-      const endDateStr = endDate.toISOString().split('T')[0];
-      const response = await fetch(`/api/jira-issues?startDate=${startDateStr}&endDate=${endDateStr}`);
-      const data = await response.json();
-      setResult(data);
-    } catch (error) {
-      setResult({ error: 'Failed to fetch issues' });
+      const response = await fetch('/api/jira/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ jiraUrl, email, apiToken }),
+      });
+      const data: TestResponse = await response.json();
+      setResult(JSON.stringify(data, null, 2));
+    } catch {
+      setResult('Projects test failed');
     }
-    setLoading(false);
   };
 
-  const testJiraProjects = async () => {
-    setLoading(true);
+  const testIssues = async () => {
     try {
-      const response = await fetch('/api/jira-projects');
-      const data = await response.json();
-      setResult(data);
-    } catch (error) {
-      setResult({ error: 'Failed to fetch projects' });
+      const response = await fetch('/api/jira/issues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          jiraUrl, 
+          email, 
+          apiToken, 
+          projectKey: 'TEST',
+          startDate: '2024-01-01',
+          endDate: '2024-12-31'
+        }),
+      });
+      const data: TestResponse = await response.json();
+      setResult(JSON.stringify(data, null, 2));
+    } catch {
+      setResult('Issues test failed');
     }
-    setLoading(false);
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-3xl font-bold mb-6">{t('test.title')}</h2>
-      
-      <div className="mb-6 p-4 bg-card rounded border">
-        <h3 className="text-lg font-semibold mb-4">{t('test.dateRange')}</h3>
-        <div className="flex space-x-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('test.startDate')}</label>
-            <DatePicker 
-              date={startDate}
-              onDateChange={(date) => date && setStartDate(date)}
-              placeholder={t('test.startDatePlaceholder')}
-            />
+    <div className="container mx-auto p-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Jira API Test</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Input
+            placeholder="Jira URL"
+            value={jiraUrl}
+            onChange={(e) => setJiraUrl(e.target.value)}
+          />
+          <Input
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Input
+            placeholder="API Token"
+            type="password"
+            value={apiToken}
+            onChange={(e) => setApiToken(e.target.value)}
+          />
+          
+          <div className="flex gap-2">
+            <Button onClick={testConnection}>Test Connection</Button>
+            <Button onClick={testProjects}>Test Projects</Button>
+            <Button onClick={testIssues}>Test Issues</Button>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">{t('test.endDate')}</label>
-            <DatePicker 
-              date={endDate}
-              onDateChange={(date) => date && setEndDate(date)}
-              placeholder={t('test.endDatePlaceholder')}
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="space-x-4 mb-6">
-        <button 
-          onClick={testJiraAPI}
-          disabled={loading}
-          className="bg-blue-600  px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? t('test.testing') : t('test.authTest')}
-        </button>
-
-        <button 
-          onClick={testJiraProjects}
-          disabled={loading}
-          className="bg-purple-600  px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50"
-        >
-          {loading ? t('test.loading') : t('test.projectList')}
-        </button>
-
-        <button 
-          onClick={testJiraIssues}
-          disabled={loading}
-          className="bg-green-600  px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
-        >
-          {loading ? t('test.loading') : t('test.issueQuery')}
-        </button>
-      </div>
-
-      {result && (
-        <div className="mt-6 p-4 bg-card rounded border">
-          <pre className="text-sm overflow-auto max-h-96 text-foreground">
-            {JSON.stringify(result, null, 2)}
+          
+          <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto max-h-96">
+            {result}
           </pre>
-        </div>
-      )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

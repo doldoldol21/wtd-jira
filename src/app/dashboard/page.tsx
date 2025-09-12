@@ -11,9 +11,51 @@ import { IssueCard } from '@/components/issue-card';
 import { DashboardCharts } from '@/components/dashboard-charts';
 import { SummaryReport } from '@/components/summary-report';
 import { PageLayout } from '@/components/page-layout';
-import { getJiraConfig, removeJiraConfig } from '@/lib/jira-config';
+import { getJiraConfig } from '@/lib/jira-config';
 import { t } from '@/lib/i18n';
 import { TranslatedText } from '@/components/translated-text';
+
+interface JiraConfig {
+  jiraUrl: string;
+  email: string;
+  apiToken: string;
+}
+
+interface DashboardData {
+  projectKey: string;
+  kpi: {
+    totalIssues: number;
+    resolvedIssues: number;
+    resolutionRate: number;
+    avgResolutionDays: number;
+  };
+  issues?: {
+    recent?: Issue[];
+    oldestUnresolved?: Issue[];
+    popular?: Issue[];
+    hot?: Issue[];
+  };
+  topLists?: {
+    recent?: Issue[];
+    oldest?: Issue[];
+    popular?: Issue[];
+    hot?: Issue[];
+  };
+}
+
+interface Issue {
+  key: string;
+  summary: string;
+  status: string;
+  created?: string;
+  assignee?: string;
+  priority?: string;
+  watchers?: number;
+  comments?: number;
+  watchCount?: number;
+  commentCount?: number;
+  daysOld?: number;
+}
 
 interface Project {
   key: string;
@@ -29,12 +71,12 @@ interface DatePreset {
 
 export default function Dashboard() {
   const router = useRouter();
-  const [jiraConfig, setJiraConfig] = useState<any>(null);
+  const [jiraConfig, setJiraConfig] = useState<JiraConfig | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<string>('');
   const [loading, setLoading] = useState(false);
   const [projectsLoading, setProjectsLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isConfigValid, setIsConfigValid] = useState(false);
 
   // Jira 설정 확인 및 로드

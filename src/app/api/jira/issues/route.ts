@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
       jql += ` AND created >= "${startDate}" AND created <= "${endDate}"`;
     }
 
-    // 모든 이슈 조회
-    const allIssuesUrl = `${jiraUrl}/rest/api/3/search?jql=${encodeURIComponent(jql)}&maxResults=1000&fields=summary,status,created,resolutiondate,assignee,priority,watches,comment`;
+    // 새로운 API 엔드포인트 사용
+    const allIssuesUrl = `${jiraUrl}/rest/api/3/search/jql?jql=${encodeURIComponent(jql)}&maxResults=1000&fields=summary,status,created,resolutiondate,assignee,priority,watches,comment`;
     
     const allIssuesResponse = await fetch(allIssuesUrl, {
       headers: {
@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
 
     // 해결된 이슈들
     const resolvedJql = `${jql} AND status in (Done, Resolved, Closed)`;
-    const resolvedIssuesUrl = `${jiraUrl}/rest/api/3/search?jql=${encodeURIComponent(resolvedJql)}&maxResults=1000&fields=summary,status,created,resolutiondate,assignee`;
+    const resolvedIssuesUrl = `${jiraUrl}/rest/api/3/search/jql?jql=${encodeURIComponent(resolvedJql)}&maxResults=1000&fields=summary,status,created,resolutiondate,assignee`;
     
     const resolvedIssuesResponse = await fetch(resolvedIssuesUrl, {
       headers: {
